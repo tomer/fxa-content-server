@@ -23,7 +23,7 @@ define(function (require, exports, module) {
       this._createView = options.createView;
     },
 
-    showChildView: function (ChildView) {
+    showChildView: function (ChildView, options) {
       var self = this;
       if (self._panelViews.indexOf(ChildView) === -1) {
         console.warn('Tried to show a view that is not a subpanel');
@@ -35,7 +35,7 @@ define(function (require, exports, module) {
         self._currentChildView.closePanel();
       }
 
-      return self._createChildViewIfNeeded(ChildView)
+      return self._createChildViewIfNeeded(ChildView, options)
         .then(function (childView) {
           if (childView) {
             self._currentChildView = childView;
@@ -63,7 +63,7 @@ define(function (require, exports, module) {
     },
 
     // Render childView if an instance doesn't already exist
-    _createChildViewIfNeeded: function (ChildView) {
+    _createChildViewIfNeeded: function (ChildView, options) {
       var self = this;
       var childView = self._childViewInstanceFromClass(ChildView);
       if (childView) {
@@ -80,7 +80,7 @@ define(function (require, exports, module) {
         // Each child view receives its own model on creation. The
         // child view's model will be updated with the appropriate data
         // when shown.
-        model: new Backbone.Model(),
+        model: (options && options.model) || new Backbone.Model(),
         parentView: self._parent
       });
 
