@@ -903,7 +903,7 @@ define([
   function clearBrowserNotifications() {
     return function () {
       return this.parent
-        .execute(function (command, done) {
+        .execute(function () {
           sessionStorage.removeItem('webChannelEvents');
         });
     };
@@ -933,7 +933,11 @@ define([
           check();
         }, [command])
         .then(null, function (err) {
-          if (/ScriptTimeout/.test(String(err))) {
+          var errorMessage = String(err);
+          // `ScriptTimeout` is the Selenium error
+          // `Timed out` is returned by Marionette as of 2015-08-11.
+          // See https://github.com/mozilla/geckodriver/issues/176
+          if (/ScriptTimeout/.test(errorMessage) || /Timed out/.test(errorMessage)) {
             var noSuchNotificationError = new Error('NoSuchBrowserNotification');
             noSuchNotificationError.command = command;
             throw noSuchNotificationError;
@@ -1391,7 +1395,15 @@ define([
           } else {
             return this.parent
               .closeCurrentWindow()
-              .switchToWindow(tabName || handles[0]);
+              // switching to the root window fixes a problem when using
+              // Marionette where it cannot switch directly from the current
+              // window to a named window.
+              .switchToWindow(handles[0]);
+          }
+        })
+        .then(function () {
+          if (tabName) {
+            return this.parent.switchToWindow(tabName);
           }
         });
     };
