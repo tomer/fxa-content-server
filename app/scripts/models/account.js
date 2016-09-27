@@ -356,6 +356,8 @@ define(function (require, exports, module) {
       var self = this;
       options = options || {};
 
+      self._metrics.logEvent('core.signin.attempt');
+
       return p().then(function () {
         var email = self.get('email');
         var sessionToken = self.get('sessionToken');
@@ -375,6 +377,8 @@ define(function (require, exports, module) {
         }
       })
       .then(function (updatedSessionData) {
+        self._metrics.logEvent('core.signin.success');
+
         self.set(updatedSessionData);
         return updatedSessionData;
       });
@@ -394,6 +398,8 @@ define(function (require, exports, module) {
       var self = this;
       options = options || {};
 
+      self._metrics.logEvent('core.signup.attempt');
+
       return self._fxaClient.signUp(
         self.get('email'),
         password,
@@ -404,6 +410,9 @@ define(function (require, exports, module) {
           resume: options.resume
         })
         .then(function (updatedSessionData) {
+
+          self._metrics.logEvent('core.signup.success');
+
           self.set(updatedSessionData);
         });
     },

@@ -63,7 +63,8 @@ define(function (require, exports, module) {
             baz: 'qux',
             foo: 'bar'
           };
-        }
+        },
+        logEvent: function () {}
       };
       oAuthClient = new OAuthClient();
       profileClient = new ProfileClient();
