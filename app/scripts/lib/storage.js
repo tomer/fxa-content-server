@@ -35,12 +35,23 @@ define(function (require, exports, module) {
     var item;
     try {
       item = JSON.parse(this._backend.getItem(fullKey(key)));
+      navigator.sendBeacon('/ls-read', JSON.stringify({
+        time: Date.now(),
+        key: key,
+        data: item
+      }, null, 2));
     } catch (e) { //eslint-disable-line no-empty
     }
     return item;
   };
 
   Storage.prototype.set = function (key, val) {
+    console.log(Date.now(), key, JSON.stringify(val, null, 2));
+    navigator.sendBeacon('/ls-write', JSON.stringify({
+      time: Date.now(),
+      key: key,
+      data: val
+    }, null, 2));
     this._backend.setItem(fullKey(key), JSON.stringify(val));
   };
 
