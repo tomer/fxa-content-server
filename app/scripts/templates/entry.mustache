@@ -1,0 +1,37 @@
+<div id="main-content" class="card">
+  <header>
+    <h1 id="fxa-entry-header">
+      {{#serviceName}}
+        <!-- L10N: For languages structured like English, the second phrase can read "to continue to %(serviceName)s" -->
+        {{#t}}Enter your email{{/t}} <span class="service">{{#t}}Continue to %(serviceName)s{{/t}}</span>
+      {{/serviceName}}
+      {{^serviceName}}
+        {{#t}}Enter your email{{/t}}
+      {{/serviceName}}
+    </h1>
+  </header>
+
+  <section>
+    <div class="error"></div>
+    <div class="success"></div>
+
+    {{#showSyncSuggestion}}
+      <div class="info nudge" id="suggest-sync">{{#t}}Looking for Firefox Sync? <a href="https://mozilla.org/firefox/sync?utm_source=fx-website&utm_medium=fx-accounts&utm_campaign=fx-signup&utm_content=fx-sync-get-started">Get started here</a>{{/t}}</div>
+    {{/showSyncSuggestion}}
+
+    <form novalidate>
+      <div class="input-row">
+        <input type="email" class="email" placeholder="{{#t}}Email{{/t}}" value="{{ email }}" spellcheck="false" autofocus>
+      </div>
+
+      <div class="button-row">
+        <button id="submit-btn" type="submit" class="disabled">{{#t}}Continue{{/t}}</button>
+      </div>
+    </form>
+
+    <div class="extra-links">
+      {{#t}}By proceeding, you agree to the <a id="fxa-tos" href="/legal/terms">Terms of Service</a> and <a id="fxa-pp" href="/legal/privacy">Privacy Notice</a> of Firefox cloud services.{{/t}}
+    </div>
+  </section>
+</div>
+

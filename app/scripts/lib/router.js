@@ -12,10 +12,11 @@ define(function (require, exports, module) {
   const AvatarGravatarView = require('../views/settings/avatar_gravatar');
   const Backbone = require('backbone');
   const CannotCreateAccountView = require('../views/cannot_create_account');
-  const VerificationReasons = require('lib/verification-reasons');
   const ChangePasswordView = require('../views/settings/change_password');
   const ChooseWhatToSyncView = require('../views/choose_what_to_sync');
   const ClearStorageView = require('../views/clear_storage');
+  const ClientDisconnectView = require('../views/settings/client_disconnect');
+  const ClientsView = require('../views/settings/clients');
   const CommunicationPreferencesView = require('../views/settings/communication_preferences');
   const CompleteResetPasswordView = require('../views/complete_reset_password');
   const CompleteSignUpView = require('../views/complete_sign_up');
@@ -23,25 +24,24 @@ define(function (require, exports, module) {
   const ConfirmView = require('../views/confirm');
   const CookiesDisabledView = require('../views/cookies_disabled');
   const DeleteAccountView = require('../views/settings/delete_account');
-  const ClientsView = require('../views/settings/clients');
-  const ClientDisconnectView = require('../views/settings/client_disconnect');
   const DisplayNameView = require('../views/settings/display_name');
+  const EntryView = require('../views/entry');
   const ForceAuthView = require('../views/force_auth');
   const GravatarPermissionsView = require('../views/settings/gravatar_permissions');
   const LegalView = require('../views/legal');
-  const p = require('./promise');
   const PermissionsView = require('../views/permissions');
   const PpView = require('../views/pp');
   const ReadyView = require('../views/ready');
   const ReportSignInView = require('views/report_sign_in');
   const ResetPasswordView = require('../views/reset_password');
   const SettingsView = require('../views/settings');
-  const SignInView = require('../views/sign_in');
   const SignInReportedView = require('views/sign_in_reported');
   const SignInUnblockView = require('../views/sign_in_unblock');
+  const SignInView = require('../views/sign_in');
   const SignUpView = require('../views/sign_up');
   const Storage = require('./storage');
   const TosView = require('../views/tos');
+  const VerificationReasons = require('lib/verification-reasons');
 
   function createViewHandler(View, options) {
     return function () {
@@ -61,7 +61,7 @@ define(function (require, exports, module) {
 
   const Router = Backbone.Router.extend({
     routes: {
-      '(/)': 'redirectToSignupOrSettings',
+      '(/)': createViewHandler(EntryView),
       'cannot_create_account(/)': createViewHandler(CannotCreateAccountView),
       'choose_what_to_sync(/)': createViewHandler(ChooseWhatToSyncView),
       'clear(/)': createViewHandler(ClearStorageView),
@@ -75,7 +75,7 @@ define(function (require, exports, module) {
       'legal(/)': createViewHandler(LegalView),
       'legal/privacy(/)': createViewHandler(PpView),
       'legal/terms(/)': createViewHandler(TosView),
-      'oauth(/)': 'redirectToBestOAuthChoice',
+      'oauth(/)': createViewHandler(EntryView),
       'oauth/force_auth(/)': createViewHandler(ForceAuthView),
       'oauth/signin(/)': createViewHandler(SignInView),
       'oauth/signup(/)': createViewHandler(SignUpView),
@@ -150,60 +150,6 @@ define(function (require, exports, module) {
 
     navigateBack () {
       this.window.history.back();
-    },
-
-    redirectToSignupOrSettings () {
-      var url = this.user.getSignedInAccount().get('sessionToken') ?
-                  '/settings' : '/signup';
-      this.navigate(url, { replace: true, trigger: true });
-    },
-
-    /**
-     * Redirect the user to the best suitable OAuth flow.
-     * If email parameter is available, it will check to see if an
-     * an account associated with it and navigate to signin/signup page.
-     *
-     * @returns {Promise}
-     */
-    redirectToBestOAuthChoice () {
-      // Attempt to get email address from relier
-      var email = this.broker.relier.get('email');
-
-      return p().then(() => {
-        if (email) {
-          // Attempt to get account status of email and navigate
-          // to correct signin/signup page if exists.
-          var account = this.user.initAccount({ email: email });
-          return this.user.checkAccountEmailExists(account)
-            .then(function (exists) {
-              if (exists) {
-                return '/oauth/signin';
-              } else {
-                return '/oauth/signup';
-              }
-            }, (err) => {
-              // The error here is a throttling error or server error (500).
-              // In either case, we don't want to stop the user from
-              // navigating to a signup/signin page. Instead, we fallback
-              // to choosing navigation page based on whether account is
-              // a default account. Swallow and log error.
-              this.metrics.logError(err);
-            });
-        }
-        // If no email in relier, choose navigation page based on
-        // whether account is a default account.
-      })
-      .then((route) => {
-        if (! route) {
-          if (this.user.getChooserAccount().isDefault()) {
-            route = '/oauth/signup';
-          } else {
-            route = '/oauth/signin';
-          }
-        }
-
-        return this.navigate(route, { replace: true, trigger: true });
-      });
     },
 
     /**
