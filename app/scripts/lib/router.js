@@ -11,6 +11,7 @@ define(function (require, exports, module) {
   const AvatarCropView = require('../views/settings/avatar_crop');
   const AvatarGravatarView = require('../views/settings/avatar_gravatar');
   const Backbone = require('backbone');
+  const ConnectThisFirefoxView = require('../views/connect_this_firefox');
   const CannotCreateAccountView = require('../views/cannot_create_account');
   const VerificationReasons = require('lib/verification-reasons');
   const ChangePasswordView = require('../views/settings/change_password');
@@ -35,6 +36,7 @@ define(function (require, exports, module) {
   const ReadyView = require('../views/ready');
   const ReportSignInView = require('views/report_sign_in');
   const ResetPasswordView = require('../views/reset_password');
+  const SendSmsView = require('../views/send_sms');
   const SettingsView = require('../views/settings');
   const SignInView = require('../views/sign_in');
   const SignInReportedView = require('views/sign_in_reported');
@@ -68,6 +70,7 @@ define(function (require, exports, module) {
       'clear(/)': createViewHandler(ClearStorageView),
       'complete_reset_password(/)': createViewHandler(CompleteResetPasswordView),
       'complete_signin(/)': createViewHandler(CompleteSignUpView, { type: VerificationReasons.SIGN_IN }),
+      'connect_this_firefox(/)': createViewHandler(ConnectThisFirefoxView),
       'confirm(/)': createViewHandler(ConfirmView, { type: VerificationReasons.SIGN_UP }),
       'confirm_reset_password(/)': createViewHandler(ConfirmResetPasswordView),
       'confirm_signin(/)': createViewHandler(ConfirmView, { type: VerificationReasons.SIGN_IN }),
@@ -84,6 +87,7 @@ define(function (require, exports, module) {
       'reset_password(/)': createViewHandler(ResetPasswordView),
       'reset_password_confirmed(/)': createViewHandler(ReadyView, { type: VerificationReasons.PASSWORD_RESET }),
       'reset_password_verified(/)': createViewHandler(ReadyView, { type: VerificationReasons.PASSWORD_RESET }),
+      'send_sms(/)': createViewHandler(SendSmsView),
       'settings(/)': createViewHandler(SettingsView),
       'settings/avatar/camera(/)': createChildViewHandler(AvatarCameraView, SettingsView),
       'settings/avatar/change(/)': createChildViewHandler(AvatarChangeView, SettingsView),

@@ -11,13 +11,17 @@ define(function (require, exports, module) {
   const _ = require('underscore');
   const AuthErrors = require('lib/auth-errors');
   const Backbone = require('backbone');
+  const Cocktail = require('cocktail');
   const Constants = require('lib/constants');
   const MarketingEmailPrefs = require('models/marketing-email-prefs');
   const OAuthToken = require('models/oauth-token');
   const p = require('lib/promise');
   const ProfileErrors = require('lib/profile-errors');
   const ProfileImage = require('models/profile-image');
+  const ResumeTokenMixin = require('models/mixins/resume-token');
+  const SearchParamMixin = require('models/mixins/search-param');
   const SignInReasons = require('lib/sign-in-reasons');
+  const vat = require('lib/vat');
 
   var NEWSLETTER_ID = Constants.MARKETING_EMAIL_NEWSLETTER_ID;
 
@@ -99,7 +103,14 @@ define(function (require, exports, module) {
       this.on('change', this._boundOnChange);
     },
 
+    resumeTokenFields: ['email'],
+
+    resumeTokenSchema: {
+      email: vat.email()
+    },
+
     // Hydrate the account
+
     fetch () {
       if (! this.get('sessionToken') || this.get('verified')) {
         return p();
@@ -115,6 +126,12 @@ define(function (require, exports, module) {
           }
           // Ignore other errors; we'll just fetch again when needed
         });
+    },
+
+    fetchFromResumeToken () {
+      return p().then(() => {
+        this.populateFromStringifiedResumeToken(this.getSearchParam('resume'));
+      });
     },
 
     _invalidateSession () {
@@ -930,6 +947,12 @@ define(function (require, exports, module) {
           });
       };
     });
+
+  Cocktail.mixin(
+    Account,
+    ResumeTokenMixin,
+    SearchParamMixin
+  );
 
   module.exports = Account;
 });

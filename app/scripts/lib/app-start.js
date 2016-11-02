@@ -631,8 +631,17 @@ define(function (require, exports, module) {
       return this._isContext(Constants.FX_DESKTOP_V1_CONTEXT);
     },
 
+    _canBeContext (context) {
+      const ua = this._window.navigator.userAgent;
+      if (context === Constants.FX_DESKTOP_V3_CONTEXT) {
+        return true;///Firefox\/[456789]\d\./.test(ua);
+      }
+    },
+
     _isFxDesktopV3 () {
-      return this._isContext(Constants.FX_DESKTOP_V3_CONTEXT);
+      const context = Constants.FX_DESKTOP_V3_CONTEXT;
+      return this._isContext(context) ||
+             (this._isServiceSync() && this._canBeContext(context));
     },
 
     _isFxDesktopV2 () {

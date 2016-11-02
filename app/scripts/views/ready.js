@@ -69,7 +69,10 @@ define(function (require, exports, module) {
       return {
         headerId: this._getHeaderId(),
         headerTitle: this._getHeaderTitle(),
-        isSignupDevice: true,
+        isSignupDevice: false,
+        isDesktop: false,
+        isFirefoxAndroid: true,
+        isAndroid: false,
         isSync: this.relier.isSync(),
         readyToSyncText: this._getReadyToSyncText(),
         redirectUri: this.relier.get('redirectUri'),

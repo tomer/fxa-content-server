@@ -70,90 +70,98 @@ define(function (require, exports, module) {
     },
 
     beforeRender () {
-      var verificationInfo = this._verificationInfo;
-      if (! verificationInfo.isValid()) {
-        // One or more parameters fails validation. Abort and show an
-        // error message before doing any more checks.
-        this.logError(AuthErrors.toError('DAMAGED_VERIFICATION_LINK'));
-        return true;
-      }
+      const account = this.getAccount();
 
-      var code = verificationInfo.get('code');
-      var options = {
-        reminder: this._verificationInfo.get('reminder'),
-        service: this.relier.get('service')
-      };
-      return this.user.completeAccountSignUp(this.getAccount(), code, options)
-          .fail((err) => {
-            if (MarketingEmailErrors.created(err)) {
-              // A basket error should not prevent the
-              // sign up verification from completing, nor
-              // should an error be displayed to the user.
-              // Log the error and nothing else.
-              this.logError(err);
-            } else {
-              throw err;
-            }
-          })
-          .then(() => {
-            this.logViewEvent('verification.success');
-            this.notifier.trigger('verification.success');
-
-            // Update the stored account data in case it was
-            // updated by verifySignUp.
-            var account = this.getAccount();
-            this.user.setAccount(account);
-            return this.invokeBrokerMethod('afterCompleteSignUp', account);
-          })
-          .then(() => {
-            var account = this.getAccount();
-
-            if (! this.relier.isDirectAccess()) {
-              this._navigateToVerifiedScreen();
-              return false;
-            }
-
-            return account.isSignedIn()
-              .then((isSignedIn) => {
-                if (isSignedIn) {
-                  this.navigate('settings', {
-                    success: t('Account verified successfully')
-                  });
-                } else {
-                  this._navigateToVerifiedScreen();
-                }
-                return false;
-              });
-          })
-          .fail((err) => {
-            if (AuthErrors.is(err, 'UNKNOWN_ACCOUNT')) {
-              verificationInfo.markExpired();
-              err = AuthErrors.toError('UNKNOWN_ACCOUNT_VERIFICATION');
-            } else if (
-                AuthErrors.is(err, 'INVALID_VERIFICATION_CODE') ||
-                AuthErrors.is(err, 'INVALID_PARAMETER')) {
-
-              // When coming from sign-in confirmation verification, show a
-              // verification link expired error instead of damaged verification link.
-              // This error is generated because the link has already been used.
-              if (this.isSignIn()) {
-                // Disable resending verification, can only be triggered from new sign-in
-                verificationInfo.markUsed();
-                err = AuthErrors.toError('REUSED_SIGNIN_VERIFICATION_CODE');
-              } else {
-                // These server says the verification code or any parameter is
-                // invalid. The entire link is damaged.
-                verificationInfo.markDamaged();
-                err = AuthErrors.toError('DAMAGED_VERIFICATION_LINK');
-              }
-            } else {
-              // all other errors show the standard error box.
-              this.model.set('error', err);
-            }
-
-            this.logError(err);
+      return account.fetchFromResumeToken()
+        .then(() => {
+          const verificationInfo = this._verificationInfo;
+          if (! verificationInfo.isValid()) {
+            // One or more parameters fails validation. Abort and show an
+            // error message before doing any more checks.
+            this.logError(AuthErrors.toError('DAMAGED_VERIFICATION_LINK'));
             return true;
-          });
+          }
+
+          const code = verificationInfo.get('code');
+          const options = {
+            reminder: verificationInfo.get('reminder'),
+            service: this.relier.get('service')
+          };
+
+          return this.user.completeAccountSignUp(account, code, options);
+        })
+        .fail((err) => {
+          if (MarketingEmailErrors.created(err)) {
+            // A basket error should not prevent the
+            // sign up verification from completing, nor
+            // should an error be displayed to the user.
+            // Log the error and nothing else.
+            this.logError(err);
+          } else {
+            throw err;
+          }
+        })
+        .then(() => {
+          this.logViewEvent('verification.success');
+          this.notifier.trigger('verification.success');
+
+          // Update the stored account data in case it was
+          // updated by verifySignUp.
+          var account = this.getAccount();
+          this.user.setAccount(account);
+          return this.invokeBrokerMethod('afterCompleteSignUp', account);
+        })
+        .then(() => {
+          var account = this.getAccount();
+
+          // at this point, on a web channel capable device,
+          // the user is signed in
+          if (! this.relier.isDirectAccess()) {
+            this._navigateToVerifiedScreen();
+            return false;
+          }
+
+          return account.isSignedIn()
+            .then((isSignedIn) => {
+              if (isSignedIn) {
+                this.navigate('settings', {
+                  success: t('Account verified successfully')
+                });
+              } else {
+                this._navigateToVerifiedScreen();
+              }
+              return false;
+            });
+        })
+        .fail((err) => {
+          if (AuthErrors.is(err, 'UNKNOWN_ACCOUNT')) {
+            verificationInfo.markExpired();
+            err = AuthErrors.toError('UNKNOWN_ACCOUNT_VERIFICATION');
+          } else if (
+              AuthErrors.is(err, 'INVALID_VERIFICATION_CODE') ||
+              AuthErrors.is(err, 'INVALID_PARAMETER')) {
+
+            // When coming from sign-in confirmation verification, show a
+            // verification link expired error instead of damaged verification link.
+            // This error is generated because the link has already been used.
+            if (this.isSignIn()) {
+              // Disable resending verification, can only be triggered from new sign-in
+              verificationInfo.markUsed();
+              err = AuthErrors.toError('REUSED_SIGNIN_VERIFICATION_CODE');
+            } else {
+              // These server says the verification code or any parameter is
+              // invalid. The entire link is damaged.
+              verificationInfo.markDamaged();
+              err = AuthErrors.toError('DAMAGED_VERIFICATION_LINK');
+            }
+          } else {
+            // all other errors show the standard error box.
+            this.model.set('error', err);
+          }
+
+          this.logError(err);
+          return true;
+        });
     },
 
     context () {
@@ -186,12 +194,9 @@ define(function (require, exports, module) {
     // and clicks the "Resend" link.
     resend () {
       var account = this.user.getAccountByEmail(this._email);
-      return account.retrySignUp(
-        this.relier,
-        {
-          resume: this.getStringifiedResumeToken()
-        }
-      )
+      return account.retrySignUp(this.relier, {
+        resume: this.getStringifiedResumeToken(account)
+      })
       .fail((err) => {
         if (AuthErrors.is(err, 'INVALID_TOKEN')) {
           return this.navigate('signup', {

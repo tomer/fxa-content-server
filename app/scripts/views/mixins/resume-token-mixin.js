@@ -15,22 +15,23 @@ define(function (require, exports, module) {
      * Get a ResumeToken model.
      *
      * @method getResumeToken
+     * @param {Object} [account]
      * @returns {ResumeToken}
      */
-    getResumeToken () {
+    getResumeToken (account) {
       // there might not be any relier if the resume token is being fetched
       // for an account unlock request caused by changing the password.
+      var accountInfo = account && account.pickResumeTokenInfo();
       var flowInfo = this.flow && this.flow.pickResumeTokenInfo();
       var relierInfo = this.relier && this.relier.pickResumeTokenInfo();
       var userInfo = this.user && this.user.pickResumeTokenInfo();
 
-      // When account or user fields are needed,
-      // they can be added as part of the resumeTokenInfo
       var resumeTokenInfo = _.extend(
         {},
         flowInfo,
         relierInfo,
-        userInfo
+        userInfo,
+        accountInfo
       );
 
       return new ResumeToken(resumeTokenInfo);
@@ -40,10 +41,11 @@ define(function (require, exports, module) {
      * Get a stringified ResumeToken that can be passed along in an email
      *
      * @method getStringifiedResumeToken
+     * @param {Object} [account]
      * @returns {String}
      */
-    getStringifiedResumeToken () {
-      return this.getResumeToken().stringify();
+    getStringifiedResumeToken (account) {
+      return this.getResumeToken(account).stringify();
     }
   };
 });

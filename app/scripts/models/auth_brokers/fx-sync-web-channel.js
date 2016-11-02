@@ -21,6 +21,7 @@ define(function (require, exports, module) {
     type: 'fx-sync-web-channel',
 
     defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
+      loginAnyTab: true,
       sendChangePasswordNotice: false
     }),
 

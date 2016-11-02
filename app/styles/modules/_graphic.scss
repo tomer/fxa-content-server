@@ -36,15 +36,15 @@
 }
 
 .graphic-connect-another-device {
-  @include hidpi-background-image('account-verified', 310px 74px);
-  height: 74px;
+  @include hidpi-background-image('account-verified', 310px 87px);
+  height: 87px;
   margin: 35px auto;
   width: 310px;
 }
 
 .graphic-sms-sent {
-  @include hidpi-background-image('sms-sent', 310px 74px);
-  height: 74px;
+  @include hidpi-background-image('sms-sent', 310px 87px);
+  height: 87px;
   margin: 35px auto;
   width: 310px;
 }

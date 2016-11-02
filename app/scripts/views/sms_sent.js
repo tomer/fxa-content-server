@@ -20,6 +20,13 @@ define(function (require, exports, module) {
   const View = BaseView.extend({
     template: Template,
 
+    beforeRender () {
+      if (! this.model.get('phoneNumber')) {
+        this.navigate('send_sms');
+        return false;
+      }
+    },
+
     context () {
       return {
         phoneNumber: formatPhoneNumber(this.model.get('phoneNumber'))

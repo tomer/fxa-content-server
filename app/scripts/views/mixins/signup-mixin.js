@@ -35,7 +35,7 @@ define(function (require, exports, module) {
       return this.invokeBrokerMethod('beforeSignIn', account)
         .then(() => {
           return this.user.signUpAccount(account, password, this.relier, {
-            resume: this.getStringifiedResumeToken()
+            resume: this.getStringifiedResumeToken(account)
           });
         })
         .then((account) => {

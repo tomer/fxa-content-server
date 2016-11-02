@@ -16,6 +16,7 @@ define(function (require, exports, module) {
   const BaseAuthenticationBroker = require('models/auth_brokers/base');
   const ChannelMixin = require('models/auth_brokers/mixins/channel');
   const Cocktail = require('cocktail');
+  const NavigateBehavior = require('views/behaviors/navigate');
   const p = require('lib/promise');
   const Logger = require('lib/logger');
 
@@ -40,6 +41,7 @@ define(function (require, exports, module) {
     commands: null,
 
     defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
+      loginAnyTab: false, // Can a `login` message come from any tab?
       sendChangePasswordNotice: true
     }),
 
@@ -130,6 +132,23 @@ define(function (require, exports, module) {
       // the about:accounts tab and have Sync still successfully start.
       return this._notifyRelierOfLogin(account)
         .then(() => proto.beforeSignUpConfirmationPoll.call(this, account));
+    },
+
+    afterCompleteSignUp (account) {
+      return proto.afterCompleteSignUp.call(this, account)
+        .then(() => account.isSignedIn())
+        .then((isSignedIn) => {
+          // If the user verified in a 2nd firefox instance and the Firefox
+          // supports signing in from any tab, allow the user to sign in.
+          if (! isSignedIn && this.hasCapability('loginAnyTab')) {
+            return new NavigateBehavior('connect_this_firefox', { email: account.get('email') });
+          }
+
+          // user verified in the same browser OR Fx does not support signin
+          // from any tab. In either case, allow the user to install and signin
+          // from another device by sending an SMS.
+          return new NavigateBehavior('send_sms', { email: account.get('email') });
+        });
     },
 
     afterResetPasswordConfirmationPoll (account) {

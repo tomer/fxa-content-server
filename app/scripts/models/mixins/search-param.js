@@ -20,7 +20,7 @@ define(function (require, exports, module) {
      * @returns {String}
      */
     getSearchParam (paramName) {
-      return Url.searchParam(paramName, this.window.location.search);
+      return Url.searchParam(paramName, (this.window || window).location.search);
     },
 
     /**
@@ -31,7 +31,7 @@ define(function (require, exports, module) {
      * @returns {Object}
      */
     getSearchParams (paramNames) {
-      return Url.searchParams(this.window.location.search, paramNames);
+      return Url.searchParams((this.window || window).location.search, paramNames);
     },
 
     /**
