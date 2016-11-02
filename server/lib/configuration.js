@@ -474,6 +474,27 @@ var conf = module.exports = convict({
     default: path.resolve(__dirname, '..', 'var'),
     doc: 'The path where deployment specific resources will be sought (keys, etc), and logs will be kept.',
     env: 'VAR_PATH'
+  },
+
+  twilio: {
+    authToken: {
+      default: undefined,
+      doc: 'Twilio authentication token',
+      env: 'TWILIO_AUTH_TOKEN',
+      format: String
+    },
+    accountSid: {
+      default: undefined,
+      doc: 'Twilio account id',
+      env: 'TWILIO_SID',
+      format: String
+    },
+    sendingNumber: {
+      default: undefined,
+      doc: 'Twilio sending number',
+      env: 'TWILIO_SENDING_NUMBER',
+      format: String
+    }
   }
 });
 

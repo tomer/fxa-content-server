@@ -13,6 +13,7 @@ define(function (require, exports, module) {
   const Cocktail = require('cocktail');
   const FormView = require('views/form');
   const MarketingMixin = require('views/mixins/marketing-mixin');
+  const SMSClient = require('lib/sms-client');
   const Template = require('stache!templates/send_sms');
 
   const t = msg => msg;
@@ -43,9 +44,15 @@ define(function (require, exports, module) {
 
     submit () {
       const phoneNumber = this.getElementValue('.phone-number');
-      return this.navigate('sms_sent', {
-        phoneNumber: phoneNumber
-      });
+      return SMSClient.send(phoneNumber, email)
+        .then(() => {
+          return this.navigate('sms_sent', {
+            phoneNumber: phoneNumber,
+          });
+        })
+        .fail((err) => {
+          this.displayError(err.message);
+        });
     }
   });
 
