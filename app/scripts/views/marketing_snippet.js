@@ -64,7 +64,6 @@ define(function (require, exports, module) {
 
   Cocktail.mixin(
     View,
-    MarketingMixin,
     VerificationReasonMixin
   );
 

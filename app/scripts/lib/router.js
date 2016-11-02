@@ -40,6 +40,7 @@ define(function (require, exports, module) {
   const SignInReportedView = require('views/sign_in_reported');
   const SignInUnblockView = require('../views/sign_in_unblock');
   const SignUpView = require('../views/sign_up');
+  const SmsSentView = require('../views/sms_sent');
   const Storage = require('./storage');
   const TosView = require('../views/tos');
 
@@ -105,6 +106,7 @@ define(function (require, exports, module) {
       'signup_confirmed(/)': createViewHandler(ReadyView, { type: VerificationReasons.SIGN_UP }),
       'signup_permissions(/)': createViewHandler(PermissionsView, { type: VerificationReasons.SIGN_UP }),
       'signup_verified(/)': createViewHandler(ReadyView, { type: VerificationReasons.SIGN_UP }),
+      'sms_sent(/)': createViewHandler(SmsSentView),
       'verify_email(/)': createViewHandler(CompleteSignUpView, { type: VerificationReasons.SIGN_UP })
     },
 

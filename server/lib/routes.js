@@ -149,6 +149,7 @@ module.exports = function (config, i18n) {
       '/signup_confirmed',
       '/signup_permissions',
       '/signup_verified',
+      '/sms_sent',
       '/verify_email'
     ];
 

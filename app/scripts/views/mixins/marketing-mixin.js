@@ -11,27 +11,56 @@ define(function (require, exports, module) {
   'use strict';
 
   const $ = require('jquery');
+  const MarketingSnippet = require('views/marketing_snippet');
+  const MarketingSnippetiOS = require('views/marketing_snippet_ios');
 
-  var MarketingMixin = {
+  const MarketingMixin = {
+    initialize (options) {
+      this._able = options.able;
+      this._language = options.language;
+    },
+
     events: {
       'click .marketing-link': '_onMarketingClick'
     },
 
     afterRender () {
-      this.$('.marketing-link').each((index, element) => {
-        element = $(element);
+      return this._createMarketingSnippet()
+        .then(() => {
+          this.$('.marketing-link').each((index, element) => {
+            const $element = $(element);
 
-        // all links must open in a new tab or else their clicks
-        // are not logged.
-        if (! element.attr('target')) {
-          element.attr('target', '_blank');
-        }
+            const id = $element.attr('data-marketing-id');
+            const url = $element.attr('href');
 
-        var id = element.attr('data-marketing-id');
-        var url = element.attr('href');
+            this.metrics.logMarketingImpression(id, url);
+          });
+        });
+    },
 
-        this.metrics.logMarketingImpression(id, url);
-      });
+    _createMarketingSnippet () {
+      if (! this.broker.hasCapability('emailVerificationMarketingSnippet')) {
+        return p();
+      }
+
+      var marketingSnippetOpts = {
+        el: this.$('.marketing-area'),
+        language: this._language,
+        metrics: this.metrics,
+        service: this.relier.get('service'),
+        type: this.model.get('type')
+      };
+
+      var marketingSnippet;
+      if (this._able.choose('springCampaign2015')) {
+        marketingSnippet = new MarketingSnippetiOS(marketingSnippetOpts);
+      } else {
+        marketingSnippet = new MarketingSnippet(marketingSnippetOpts);
+      }
+
+      this.trackChildView(marketingSnippet);
+
+      return marketingSnippet.render();
     },
 
     _onMarketingClick (event) {

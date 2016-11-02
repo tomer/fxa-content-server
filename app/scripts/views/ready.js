@@ -13,8 +13,7 @@ define(function (require, exports, module) {
   const Cocktail = require('cocktail');
   const Constants = require('lib/constants');
   const FormView = require('views/form');
-  const MarketingSnippet = require('views/marketing_snippet');
-  const MarketingSnippetiOS = require('views/marketing_snippet_ios');
+  const MarketingMixin = require('views/mixins/marketing-mixin');
   const p = require('lib/promise');
   const ServiceMixin = require('views/mixins/service-mixin');
   const Template = require('stache!templates/ready');
@@ -62,12 +61,7 @@ define(function (require, exports, module) {
     template: Template,
     className: 'ready',
 
-    initialize (options) {
-      options = options || {};
-
-      this._able = options.able;
-      this._language = options.language;
-
+    initialize (options = {}) {
       this._templateInfo = TEMPLATE_INFO[this.keyOfVerificationReason(options.type)];
     },
 
@@ -75,6 +69,7 @@ define(function (require, exports, module) {
       return {
         headerId: this._getHeaderId(),
         headerTitle: this._getHeaderTitle(),
+        isSignupDevice: true,
         isSync: this.relier.isSync(),
         readyToSyncText: this._getReadyToSyncText(),
         redirectUri: this.relier.get('redirectUri'),
@@ -105,9 +100,16 @@ define(function (require, exports, module) {
     },
 
     submit () {
+      const phoneNumber = this.getElementValue('.phone-number');
+      return this.navigate('sms_sent', {
+        phoneNumber: phoneNumber
+      });
+      /*
+
       if (this._shouldShowProceedButton()) {
         return this._submitForProceed();
       }
+      */
     },
 
     /**
@@ -131,38 +133,13 @@ define(function (require, exports, module) {
       var graphic = this.$el.find('.graphic');
       graphic.addClass('pulse');
 
-      return this._createMarketingSnippet()
-        .then(proto.afterRender.bind(this));
-    },
-
-    _createMarketingSnippet () {
-      if (! this.broker.hasCapability('emailVerificationMarketingSnippet')) {
-        return p();
-      }
-
-      var marketingSnippetOpts = {
-        el: this.$('.marketing-area'),
-        language: this._language,
-        metrics: this.metrics,
-        service: this.relier.get('service'),
-        type: this.model.get('type')
-      };
-
-      var marketingSnippet;
-      if (this._able.choose('springCampaign2015')) {
-        marketingSnippet = new MarketingSnippetiOS(marketingSnippetOpts);
-      } else {
-        marketingSnippet = new MarketingSnippet(marketingSnippetOpts);
-      }
-
-      this.trackChildView(marketingSnippet);
-
-      return marketingSnippet.render();
+      return proto.afterRender.bind(this);
     }
   });
 
   Cocktail.mixin(
     View,
+    MarketingMixin,
     ServiceMixin,
     VerificationReasonMixin
   );

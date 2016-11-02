@@ -1,18 +1,84 @@
 <div id="main-content" class="card">
-  <header>
-    <h1 id="{{headerId}}">{{headerTitle}}</h1>
-  </header>
+  {{#isSync}}
+    {{#isSignupDevice}}
+      <div class="success visible">{{#t}}This Firefox is connected{{/t}}</div>
 
-  <section>
-    <div class="error"></div>
+      <section>
+        <div class="graphic graphic-connect-another-device">{{#t}}Success{{/t}}</div>
 
-    <div class="graphic graphic-checkbox">{{#t}}Success{{/t}}</div>
+        <p>{{#t}}Continue set-up by sending Firefox directly to your smartphone.{{/t}}</p>
 
-    {{#isSync}}
-      <p class="account-ready-service">{{readyToSyncText}}</p>
-    {{/isSync}}
+        <form novalidate>
+          <div class="input-row sms-row">
+            <input class="phone-number" type="text" placeholder="{{#t}}Mobile phone number{{/t}}" required autofocus="autofocus" />
+            <button type="submit" class="sms-send disabled">Send</button>
+          </div>
+        </form>
+      </section>
+      <div class="marketing-area"></div>
+      <div class="sms-disclaimer">
+        {{#unsafeTranslate}}SMS service available to U.S. phone numbers only. SMS &amp; data rates may apply. The intended recipient of the email or SMS must have consented. <a %(escapedLearnMoreAttributes)s>Learn more</a>{{/unsafeTranslate}}
 
-    {{^isSync}}
+    {{/isSignupDevice}}
+    {{#isDesktop}}
+      <div class="success visible">{{#t}}Email confirmed{{/t}}</div>
+
+      <div class="marketing-area"></div>
+
+      <section>
+        <p>
+          {{#t}}Complete your set-up by connecting Firefox for mobile.{{/t}}
+        </p>
+        <div class="input-row">
+          <input id="phone" type="phone" placeholder="{{#t}}Phone number{{/t}}" required autofocus />
+        </div>
+        <div class="input-row">
+          <input id="url" type="text" />
+        </div>
+      </section>
+    {{/isDesktop}}
+    {{#isFirefoxAndroid}}
+      <div class="success">{{#t}}Email confirmed{{/t}}</div>
+
+      <section>
+        <div class="graphic graphic-connect-another-device">{{#t}}Success{{/t}}</div>
+
+        <p>
+          {{#t}}Complete your set-up by connecting this Firefox.{{/t}}
+        <p>
+
+        <div class="button-row">
+          <button id="submit-btn" type="submit" class="disabled">{{#unsafeTranslate}}Continue &rarr;{{/unsafeTranslate}}</button>
+        </div>
+      </section>
+
+       <div class="links">
+         <a href="#">{{#t}}Why is this required?{{/t}}</a>
+       </div>
+    {{/isFirefoxAndroid}}
+    {{#isAndroid}}
+      <div class="success visible">{{#t}}Email confirmed{{/t}}</div>
+      <header>
+        <h1 id="{{headerId}}">{{#t}}Complete your set-up in Firefox for Android.{{/t}}</h1>
+      </header>
+
+      <section>
+        <div class="input-row">
+          <button type="submit">Continue</button>
+        </div>
+      </section>
+    {{/isAndroid}}
+  {{/isSync}}
+
+  {{^isSync}}
+    <header>
+      <h1 id="{{headerId}}">{{headerTitle}}</h1>
+    </header>
+
+    <section>
+      <div class="error"></div>
+
+      <div class="graphic graphic-checkbox">{{#t}}Success{{/t}}</div>
       {{#serviceName}}
         <p class="account-ready-service">{{#t}}You are now ready to use %(serviceName)s{{/t}}</p>
         {{#shouldShowProceedButton}}
@@ -26,9 +92,9 @@
       {{^serviceName}}
         <p class="account-ready-generic">{{#t}}Your account is ready!{{/t}}</p>
       {{/serviceName}}
-    {{/isSync}}
 
     <div class="marketing-area"></div>
-  </section>
+    </section>
+  {{/isSync}}
 </div>
 

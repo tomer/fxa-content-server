@@ -334,6 +334,14 @@ define(function (require, exports, module) {
       errno: 1047,
       // not user facing, only used for logging, not wrapped in `t`
       message: 'HTML will be escaped: %(string)s'
+    },
+    PHONE_NUMBER_REQUIRED: {
+      errno: 1048,
+      message: t('Phone number required')
+    },
+    INVALID_PHONE_NUMBER: {
+      errno: 1049,
+      message: t('Phone number invalid')
     }
 
   };
