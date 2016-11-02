@@ -44,6 +44,7 @@ define(function (require, exports, module) {
 
     submit () {
       const phoneNumber = this.getElementValue('.phone-number');
+      const email = this.model.get('email')
       return SMSClient.send(phoneNumber, email)
         .then(() => {
           return this.navigate('sms_sent', {
