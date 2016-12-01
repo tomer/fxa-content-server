@@ -71,6 +71,7 @@ define(function (require, exports, module) {
     onSignUpSuccess (account) {
       this.logViewEvent('success');
       this.logViewEvent('signup.success');
+      this.flow.clear();
 
       if (account.get('verified')) {
         // user was pre-verified.

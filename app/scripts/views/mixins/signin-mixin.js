@@ -99,6 +99,8 @@ define(function (require, exports, module) {
     },
 
     onSignInSuccess (account) {
+      this.flow.clear();
+
       if (! account.get('verified')) {
         var verificationMethod = account.get('verificationMethod');
         var verificationReason = account.get('verificationReason');
@@ -137,7 +139,9 @@ define(function (require, exports, module) {
       var navigateData = this.afterSignInNavigateData || {};
 
       return this.invokeBrokerMethod(brokerMethod, account)
-        .then(this.navigate.bind(this, this.model.get('redirectTo') || 'settings', {}, navigateData));
+        .then(() => {
+          this.navigate(this.model.get('redirectTo') || 'settings', {}, navigateData);
+        });
     }
   };
 });

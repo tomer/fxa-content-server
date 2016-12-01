@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Tells the server to emit the `flow.${viewName}.begin` event.
+// Tells the server to emit the `flow.begin` event.
 // THIS MUST BE MIXED IN *AFTER* views/mixins/flow-events-mixin.
 
 define(function (require, exports, module) {
@@ -10,10 +10,7 @@ define(function (require, exports, module) {
 
   module.exports = {
     afterRender () {
-      const flowId = this.flow.get('flowId');
-      const flowBegin = this.flow.get('flowBegin');
-
-      this.metrics.logFlowBegin(flowId, flowBegin);
+      this.metrics.logFlowBegin();
     }
   };
 });

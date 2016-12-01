@@ -13,11 +13,16 @@ define(function (require, exports, module) {
 
   module.exports = {
     afterRender () {
-      this.flow = new Flow({
-        sentryMetrics: this.sentryMetrics,
-        window: this.window
-      });
-      this.metrics.setFlowModel(this.flow);
+      // If a user signs out then signs back in again, a flow model
+      // will already exist. Don't create a new one in that case,
+      // lest we emit events with a duplicate flow id.
+      if (! this.flow) {
+        this.flow = new Flow({
+          sentryMetrics: this.sentryMetrics,
+          window: this.window
+        });
+        this.metrics.setFlowModel(this.flow);
+      }
     },
 
     events: {

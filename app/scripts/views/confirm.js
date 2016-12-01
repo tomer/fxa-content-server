@@ -124,6 +124,8 @@ define(function (require, exports, module) {
         })
         .then(() => {
           // the user is definitely authenticated here.
+          this.flow.clear();
+
           if (this.relier.isDirectAccess()) {
             this.navigate('settings', {
               success: t('Account verified successfully')
