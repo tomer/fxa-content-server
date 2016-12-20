@@ -27,6 +27,7 @@ define(function (require, exports, module) {
 
     beforeEach(function () {
       translator = new Translator();
+      translator._clearTranslationValues();
 
       mockView = {
         isInExperimentGroup () {

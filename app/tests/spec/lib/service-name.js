@@ -17,6 +17,7 @@ define(function (require, exports, module) {
   describe('lib/service-name', function () {
     beforeEach(function () {
       var translator = new Translator();
+      translator._clearTranslationValues();
       serviceName = new ServiceName(translator);
     });
     it('converts a service to the service name', function () {

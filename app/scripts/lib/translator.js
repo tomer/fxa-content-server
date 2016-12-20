@@ -88,6 +88,19 @@ define(function (require, exports, module) {
       return (templateText) => {
         return this.get(forceText || templateText, context);
       };
+    },
+
+    /**
+     * Resets the translated values to null
+     *
+     * Useful in tests to avoid failures when
+     * running tests with a non-EN-US locale.
+     * @private
+     */
+    _clearTranslationValues () {
+      Object.keys(this.__translations__).forEach((translationKey) => {
+        this.__translations__[translationKey] = null;
+      });
     }
 
   };

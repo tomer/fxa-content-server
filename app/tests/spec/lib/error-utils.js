@@ -42,6 +42,7 @@ define(function (require, exports, module) {
       };
 
       translator = new Translator();
+      translator._clearTranslationValues();
 
       windowMock = new WindowMock();
       sandbox.spy(windowMock.console, 'error');
